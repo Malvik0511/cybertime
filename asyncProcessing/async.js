@@ -1,60 +1,40 @@
-window.onload = function(){
+"use strict";
+
+window.onload = () => {
+	/*проверку на тип элементов не провожу т.к. в функции это можно использовать
+	проверку нулевого и последнего аргуметов не провожу так как интерпритатор по
+	ним возбудит ошибку самостоятельно
+	*/
 	function launchInParallel (func, data, n, callback) {
-		console.dir(func)
+		if (!Array.isArray(data)) throw Error(data + " are not array");
+		if (isNaN(n) || n < 1) throw Error('n must be number equal or more than 1');
 		var i = 0,	
 	  		count = 0,
-	  		len = data.length
+	  		len = data.length;
+
   		function iterratorAsync(){
-  			if (count > n) {
-  				setTimeout(iterratorAsync, 1);
-  				console.log('count = ' + count)
-  				//console.log( count + ' overflow')
-  			}
-  			else{
+  			if (count < n){
   				count++;
-  				func.call(null, data[i], function(){
+  				func.call(null, data[i], () => {
 	  				count--;
-	  				console.log('i = '+ i)
-	  				if (i >= len && count === 0){
+	  				if (count === 0 && i === len -1){
 	  					callback();
-	  					return;
 	  				}
-	  			})
-	  			if (i < len){
-	  				console.log('!')
+	  				else if (i < (len - 1) && count < n){
+	  					i++;
+	  					iterratorAsync();
+	  				}
+	  			});
+
+	  			if (i < (len - 1) && count < n){
 	  				i++;
-	  				iterratorAsync()
-	  			}
-	  			
+	  				iterratorAsync();
+	  			}	  			
   			}
 	  	}
+
 	  	iterratorAsync();
-
-  	// не более n функций должны исполняться в любой момент времени
-  	// FIXME
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-function sleep (s, callback) {
-  setTimeout(callback, s * 1000)
-}
-
-const data = [1, 3, 2, 1, 1, 4, 2, 5]
-
-launchInParallel(sleep, data, 5, () => {
-  // должно завершиться через 6 секунд
-  console.log('done')
-})
 	
 };
 
